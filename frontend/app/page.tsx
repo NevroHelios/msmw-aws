@@ -98,15 +98,25 @@ function UploadForm() {
 
           const base64 = (reader.result as string).split(',')[1];
 
+          // Auto-detect file type based on filename and extension
+          let fileType = 'sales_csv'; // default
+          const fileName = file.name.toLowerCase();
+
+          if (fileName.endsWith('.csv')) {
+            fileType = fileName.includes('inventory') ? 'inventory_csv' : 'sales_csv';
+          } else if (fileName.match(/\.(jpg|jpeg|png)$/)) {
+            fileType = fileName.includes('receipt') ? 'receipt_image' : 'invoice_image';
+          }
+
           // Call API
-          const response = await fetch('https://pf5prjt91j.execute-api.ap-south-1.amazonaws.com/dev/dev/upload', {
+          const response = await fetch('https://pf5prjt91j.execute-api.ap-south-1.amazonaws.com/dev/upload', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               store_id: storeId,
-              file_type: file.name.includes('sales') ? 'sales_csv' : 'inventory_csv',
+              file_type: fileType,
               file_name: file.name,
               file_content: base64,
             }),
@@ -149,16 +159,19 @@ function UploadForm() {
       {/* File Upload */}
       <div>
         <label htmlFor="file" className="block text-sm font-medium text-purple-200 mb-2">
-          Choose CSV File
+          Choose File (CSV or Image)
         </label>
         <input
           type="file"
           id="file"
           name="file"
-          accept=".csv"
+          accept=".csv,.jpg,.jpeg,.png"
           required
           className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-500 file:text-white hover:file:bg-purple-600 file:cursor-pointer"
         />
+        <p className="text-xs text-purple-300 mt-2">
+          📄 CSV: sales.csv, inventory.csv | 🖼️ Images: invoice.jpg, receipt.png
+        </p>
       </div>
 
       {/* Submit Button */}

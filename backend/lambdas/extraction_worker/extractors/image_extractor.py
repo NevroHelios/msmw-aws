@@ -1,106 +1,112 @@
 """
-Image Extractor - Extract data from invoice/receipt images using LLM
+Image Extractor using Gemini REST API (pure HTTP, no SDK)
+Extracts invoice/receipt data from images using Gemini Vision
 """
-import logging
-from typing import Dict, Any
+import json
+import base64
 import os
+import urllib.request
+import urllib.error
+from typing import Dict, Any, Optional
 
-logger = logging.getLogger(__name__)
+def extract_from_image(file_content: bytes, file_name: str) -> Dict[str, Any]:
+    """
+    Extract invoice/receipt data from image using Gemini Vision API
+    Uses pure HTTP requests - no heavy SDK dependencies
+    """
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not configured")
+    
+    # Determine if it's invoice or receipt
+    doc_type = "invoice" if "invoice" in file_name.lower() else "receipt"
+    
+    # Encode image to base64
+    image_b64 = base64.b64encode(file_content).decode('utf-8')
+    
+    # Determine MIME type
+    mime_type = "image/jpeg"
+    if file_name.lower().endswith('.png'):
+        mime_type = "image/png"
+    elif file_name.lower().endswith('.webp'):
+        mime_type = "image/webp"
+    
+    # Gemini Vision API endpoint
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    
+    # Prompt for extraction
+    prompt = f"""Extract all information from this {doc_type} image and return it as JSON.
 
-# Extraction prompts for different image types
-INVOICE_PROMPT = """
-Extract structured invoice data from this image.
+For invoices, extract:
+- invoice_number
+- date (ISO format)
+- vendor_name
+- total_amount
+- currency
+- items (array of {{name, quantity, unit_price, total}})
 
-Return ONLY valid JSON with this exact structure (no other text):
-{
-  "supplier_name": "string - name of the supplier/vendor",
-  "invoice_date": "YYYY-MM-DD format",
-  "invoice_number": "string - invoice number if visible, otherwise null",
-  "items": [
-    {
-      "item_name": "string - product/service name",
-      "quantity": number,
-      "unit_price": number,
-      "gst_rate": number (0-28, GST percentage)
+For receipts, extract:
+- receipt_number (if available)
+- date (ISO format)
+- store_name
+- total_amount
+- currency
+- items (array of {{name, quantity, price}})
+
+Return ONLY valid JSON, no markdown or explanations."""
+    
+    # Request payload
+    payload = {
+        "contents": [{
+            "parts": [
+                {"text": prompt},
+                {
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": image_b64
+                    }
+                }
+            ]
+        }]
     }
-  ],
-  "total_amount": number - total invoice amount including GST,
-  "gst_amount": number - total GST amount if visible, otherwise null,
-  "payment_terms": "string - payment terms if visible, otherwise null"
-}
-
-If you cannot find a field, use null. All numbers should be numeric, not strings.
-"""
-
-RECEIPT_PROMPT = """
-Extract structured receipt data from this image.
-
-Return ONLY valid JSON with this exact structure (no other text):
-{
-  "merchant_name": "string - store/merchant name",
-  "date": "YYYY-MM-DD format",
-  "total_amount": number - total amount paid,
-  "items": [
-    {
-      "name": "string - item name",
-      "price": number
-    }
-  ],
-  "payment_method": "string - payment method (UPI/Card/Cash) if visible, otherwise null"
-}
-
-If you cannot find a field, use null.
-"""
-
-
-class ImageExtractor:
-    """Extract data from images using LLM"""
     
-    def __init__(self, llm_client):
-        """
-        Initialize image extractor.
-        
-        Args:
-            llm_client: LLM client instance (Gemini or OpenAI)
-        """
-        self.llm_client = llm_client
+    # Make HTTP request
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode('utf-8'),
+        headers={'Content-Type': 'application/json'}
+    )
     
-    def extract(self, image_data: bytes, file_type: str, mime_type: str = "image/jpeg") -> Dict[str, Any]:
-        """
-        Extract data from image.
-        
-        Args:
-            image_data: Image file bytes
-            file_type: Type of document (invoice_image, receipt_image, etc.)
-            mime_type: Image MIME type
-        
-        Returns:
-            Extracted data dictionary
-        """
-        # Get appropriate prompt
-        prompt = self._get_prompt(file_type)
-        
-        logger.info(f"Extracting {file_type} using {self.llm_client.__class__.__name__}")
-        
-        # Call LLM
-        extracted_data = self.llm_client.extract_from_image(
-            image_data=image_data,
-            prompt=prompt,
-            mime_type=mime_type
-        )
-        
-        logger.info(f"Successfully extracted {file_type}")
-        return extracted_data
-    
-    def _get_prompt(self, file_type: str) -> str:
-        """Get extraction prompt based on file type"""
-        if file_type in ['invoice_image', 'purchase_order_image']:
-            return INVOICE_PROMPT
-        elif file_type == 'receipt_image':
-            return RECEIPT_PROMPT
-        else:
-            # Generic prompt
-            return """
-            Extract all visible text and data from this image.
-            Return as JSON with relevant fields.
-            """
+    try:
+        with urllib.request.urlopen(req, timeout=30) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            
+            # Extract text from response
+            text = result['candidates'][0]['content']['parts'][0]['text']
+            
+            # Clean up JSON (remove markdown if present)
+            text = text.strip()
+            if text.startswith('```json'):
+                text = text[7:]
+            if text.startswith('```'):
+                text = text[3:]
+            if text.endswith('```'):
+                text = text[:-3]
+            text = text.strip()
+            
+            # Parse extracted JSON
+            extracted_data = json.loads(text)
+            
+            return {
+                'type': doc_type,
+                'data': extracted_data,
+                'raw_response': text
+            }
+            
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        raise Exception(f"Gemini API error: {e.code} - {error_body}")
+    except json.JSONDecodeError as e:
+        raise Exception(f"Failed to parse extracted data as JSON: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Image extraction failed: {str(e)}")

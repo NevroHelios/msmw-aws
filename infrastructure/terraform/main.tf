@@ -3,7 +3,7 @@
 
 terraform {
   required_version = ">= 1.5.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -14,7 +14,7 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = "MSME-Retail-Intelligence"
@@ -28,7 +28,7 @@ provider "aws" {
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "ap-south-1"  # Mumbai - free tier eligible
+  default     = "ap-south-1" # Mumbai - free tier eligible
 }
 
 variable "environment" {
@@ -71,5 +71,5 @@ output "lambda_functions" {
 
 output "api_gateway_url" {
   description = "API Gateway invoke URL"
-  value       = "${aws_api_gateway_deployment.main.invoke_url}/${var.environment}"
+  value       = aws_api_gateway_deployment.main.invoke_url
 }

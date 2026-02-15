@@ -10,6 +10,7 @@ import base64
 import uuid
 import logging
 from datetime import datetime
+from decimal import Decimal
 from typing import Dict, Any
 import boto3
 from botocore.exceptions import ClientError
@@ -118,7 +119,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'status': 'UPLOADED',
             'uploaded_at': datetime.utcnow().isoformat(),
             'file_name': file_name,
-            'file_size_mb': round(file_size_mb, 2)
+            'file_size_mb': Decimal(str(round(file_size_mb, 2)))
         }
         
         if not create_upload_record(upload_record):

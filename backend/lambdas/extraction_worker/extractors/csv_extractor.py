@@ -6,6 +6,8 @@ from typing import Dict, Any, List
 import pandas as pd
 from io import StringIO, BytesIO
 
+from decimal import Decimal
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +45,7 @@ class CSVExtractor:
         else:
             # Generic CSV extraction
             return {
-                'rows': df.to_dict('records'),
+                'rows': self._convert_floats_to_decimals(df.to_dict('records')),
                 'row_count': len(df),
                 'columns': df.columns.tolist()
             }
@@ -74,12 +76,17 @@ class CSVExtractor:
         sales_records = []
         for _, row in df.iterrows():
             try:
+                # Use Decimal for monetary/numeric values for DynamoDB
+                qty = Decimal(str(row['quantity']))
+                price = Decimal(str(row['price']))
+                total = qty * price
+                
                 record = {
                     'date': str(row['date']),
                     'product_name': str(row['product']),
-                    'quantity': float(row['quantity']),
-                    'unit_price': float(row['price']),
-                    'total_amount': float(row['quantity']) * float(row['price'])
+                    'quantity': qty,
+                    'unit_price': price,
+                    'total_amount': total
                 }
                 
                 # Optional fields
@@ -106,15 +113,8 @@ class CSVExtractor:
         """Extract inventory data"""
         df.columns = df.columns.str.lower().str.strip()
         
-        # Convert to records
-        inventory_records = []
-        for _, row in df.iterrows():
-            try:
-                record = row.to_dict()
-                inventory_records.append(record)
-            except Exception as e:
-                logger.warning(f"Skipping invalid row: {e}")
-                continue
+        # Convert to records using helper to handle floats
+        inventory_records = self._convert_floats_to_decimals(df.to_dict('records'))
         
         logger.info(f"Extracted {len(inventory_records)} inventory records")
         
@@ -122,3 +122,14 @@ class CSVExtractor:
             'records': inventory_records,
             'total_records': len(inventory_records)
         }
+
+    def _convert_floats_to_decimals(self, obj):
+        """Recursively convert floats to Decimals for DynamoDB"""
+        if isinstance(obj, list):
+            return [self._convert_floats_to_decimals(i) for i in obj]
+        elif isinstance(obj, dict):
+            return {k: self._convert_floats_to_decimals(v) for k, v in obj.items()}
+        elif isinstance(obj, float):
+            return Decimal(str(obj))
+        else:
+            return obj
