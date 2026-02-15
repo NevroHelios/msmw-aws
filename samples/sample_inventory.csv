@@ -1,0 +1,7 @@
+product_name,current_stock,reorder_level,supplier,last_restocked
+Rice 25kg,45,20,ABC Traders,2026-02-01
+Wheat 10kg,62,30,XYZ Suppliers,2026-02-03
+Sugar 1kg,120,50,Sweet Co,2026-02-05
+Cooking Oil 5L,28,15,Oil Pvt Ltd,2026-02-08
+Dal 1kg,55,40,Grain Traders,2026-02-10
+Tea Powder 250g,80,25,Tea House,2026-02-12

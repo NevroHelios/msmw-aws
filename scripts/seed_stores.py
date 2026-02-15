@@ -3,9 +3,13 @@
 Seed initial store data into DynamoDB
 """
 import boto3
+import os
 from datetime import datetime
 
-dynamodb = boto3.resource('dynamodb')
+# Get region from environment or use default
+region = os.environ.get('AWS_REGION', 'ap-south-1')
+
+dynamodb = boto3.resource('dynamodb', region_name=region)
 table = dynamodb.Table('Stores')
 
 # Sample stores

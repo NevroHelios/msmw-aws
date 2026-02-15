@@ -57,6 +57,9 @@ test_*.pdf
 test_*.csv
 *.pyc
 
+__pycache__
+lambdas/
+
 # Temporary files
 tmp/
 temp/

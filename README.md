@@ -96,3 +96,29 @@ terraform apply
 ## 📄 License
 
 MIT
+
+
+
+🎉 Backend Successfully Deployed to AWS!
+
+✅ Infrastructure Live
+All AWS resources are deployed and running:
+
+S3 Bucket: msme-retail-intelligence-263950571680
+DynamoDB Tables: Stores, Uploads, ExtractedData (all created)
+Lambda Functions: upload-handler + extraction-worker (CSV-only for now)
+API Gateway: Ready to receive requests
+API Endpoint: https://pf5prjt91j.execute-api.ap-south-1.amazonaws.com/dev/dev/upload
+
+🔄 Current Status
+✅ Backend deployed
+⏳ Next.js frontend installing (will complete shortly)
+⏳ Seeding test store data
+📝 Note on Package Size
+We encountered the 70MB Lambda limit (pandas, PIL, gemini SDKs are too heavy). Current deployment:
+
+✅ CSV extraction: Working! (uses lightweight parsing, no LLM needed)
+⏸️ Image/PDF extraction: Coming next with pure REST API approach
+As you suggested, we can use pure HTTP API calls to Gemini (via requests library) instead of the heavy SDK - this will keep package size small!
+
+🚀 Next Steps
