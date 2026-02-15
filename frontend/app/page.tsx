@@ -72,7 +72,8 @@ function UploadForm() {
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
+        const form = e.currentTarget;
+        const formData = new FormData(form);
         const file = formData.get('file') as File;
         const storeId = formData.get('store_id') as string;
 
@@ -82,7 +83,7 @@ function UploadForm() {
         }
 
         // Show loading
-        const button = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+        const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
         const originalText = button.textContent;
         button.textContent = '⏳ Uploading...';
         button.disabled = true;
@@ -126,7 +127,7 @@ function UploadForm() {
 
           if (response.ok) {
             alert(`✅ Upload successful!\n\nUpload ID: ${data.upload_id}\n\nThe file is being processed. Check DynamoDB for extracted data.`);
-            e.currentTarget.reset();
+            form.reset();
           } else {
             alert(`❌ Upload failed: ${data.message || 'Unknown error'}`);
           }

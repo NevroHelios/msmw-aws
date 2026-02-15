@@ -12,7 +12,11 @@ import boto3
 from botocore.exceptions import ClientError
 
 # Import extractors (pure HTTP - no heavy SDKs)
-from extractors import csv_extractor, image_extractor
+from extractors import csv_extractor
+try:
+    from extractors import image_extractor
+except ImportError:
+    image_extractor = None  # CSV-only deployment
 
 # Configure logging
 logger = logging.getLogger()
@@ -113,6 +117,8 @@ def extract_data(file_data: bytes, file_type: str, file_name: str) -> Dict[str, 
     """
     if file_type in ['invoice_image', 'receipt_image']:
         # Use image extractor (pure HTTP to Gemini)
+        if image_extractor is None:
+            raise ValueError(f"Image extraction not available in CSV-only deployment")
         return image_extractor.extract_from_image(file_data, file_name)
     
     elif file_type in ['sales_csv', 'inventory_csv']:
