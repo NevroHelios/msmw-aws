@@ -1,0 +1,62 @@
+# Logs
+*.log
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+.env.local
+.env.*.local
+config/.env
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+
+# Lambda packages
+lambda_packages/
+*.zip
+
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local storage
+local_storage/
+
+# Node (for frontend)
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# AWS
+.aws/
+
+# Test files
+test_*.jpg
+test_*.pdf
+test_*.csv
+*.pyc
+
+# Temporary files
+tmp/
+temp/

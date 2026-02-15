@@ -1,0 +1,5 @@
+# python-dotenv
+python-dotenv>=1.0.0
+
+# AWS SDK
+boto3>=1.28.0

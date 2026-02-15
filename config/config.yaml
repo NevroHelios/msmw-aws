@@ -1,0 +1,149 @@
+# MSME Retail Intelligence - Global Configuration
+
+aws:
+  region: ap-south-1  # Mumbai - Free tier eligible
+  
+  s3:
+    bucket_name: msme-retail-intelligence  # Will append account ID
+    folders:
+      raw: raw/
+      processed: processed/
+      reports: reports/
+    subfolder_structure:
+      sales_csv: sales_csv/
+      invoices_images: invoices_images/
+      receipts_images: receipts_images/
+      documents: documents/
+      bank_statements: bank_statements/
+  
+  dynamodb:
+    billing_mode: PAY_PER_REQUEST  # Free tier friendly, no provisioned capacity
+    tables:
+      stores: Stores
+      uploads: Uploads
+      extracted_data: ExtractedData
+    
+    # Enable point-in-time recovery (optional, adds cost)
+    point_in_time_recovery: false
+
+llm:
+  # Primary provider (use Gemini for free tier)
+  default_provider: gemini  # Options: gemini, openai
+  
+  # Fallback if primary fails
+  fallback_provider: openai
+  
+  # Retry settings
+  retry_attempts: 3
+  timeout_seconds: 60
+  
+  # Provider-specific settings
+  gemini:
+    model_vision: gemini-1.5-flash  # Free tier: 15 requests/min
+    model_text: gemini-1.5-flash
+    temperature: 0.1  # Low temperature for structured extraction
+  
+  openai:
+    model_vision: gpt-4o-mini  # Cheaper alternative to gpt-4-vision
+    model_text: gpt-4o-mini
+    temperature: 0.1
+
+extraction:
+  # Supported file types
+  supported_file_types:
+    - invoice_image
+    - receipt_image
+    - sales_csv
+    - inventory_csv
+    - bank_statement_pdf
+    - purchase_order_image
+  
+  # File size limits (MB)
+  max_file_size_mb: 10
+  
+  # Image processing
+  image:
+    max_dimension: 2048  # Resize to reduce LLM API costs
+    compress_quality: 85
+    supported_formats:
+      - jpg
+      - jpeg
+      - png
+      - pdf
+  
+  # CSV processing
+  csv:
+    max_rows: 10000
+    encoding: utf-8
+    
+  # Extraction schemas
+  schemas:
+    invoice:
+      required_fields:
+        - supplier_name
+        - invoice_date
+        - total_amount
+      optional_fields:
+        - invoice_number
+        - items
+        - gst_amount
+        - payment_terms
+    
+    receipt:
+      required_fields:
+        - merchant_name
+        - date
+        - total_amount
+      optional_fields:
+        - items
+        - payment_method
+    
+    sales_csv:
+      required_columns:
+        - date
+        - product_name
+        - quantity
+        - unit_price
+      optional_columns:
+        - customer_name
+        - payment_mode
+
+# Local development settings
+local:
+  use_localstack: true
+  localstack_endpoint: http://localhost:4566
+  
+  # Mock LLM responses for testing without API keys
+  mock_llm: false
+  
+  # Local storage path (instead of S3)
+  storage_path: ./local_storage
+
+# Logging
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  format: json  # json or plain
+  
+  # CloudWatch settings (AWS)
+  cloudwatch:
+    enabled: true
+    retention_days: 7  # Free tier: up to 5GB storage
+
+# API Gateway settings
+api:
+  throttle:
+    rate_limit: 100  # requests per second
+    burst_limit: 200
+  
+  cors:
+    allowed_origins:
+      - http://localhost:3000  # Development
+      - https://your-domain.com  # Production
+    allowed_methods:
+      - GET
+      - POST
+      - OPTIONS
+    allowed_headers:
+      - Content-Type
+      - Authorization
+      - X-Store-Id
