@@ -3,7 +3,7 @@
 # Upload Handler Lambda Role
 resource "aws_iam_role" "upload_handler" {
   name = "${var.project_name}-upload-handler-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -22,7 +22,7 @@ resource "aws_iam_role" "upload_handler" {
 resource "aws_iam_role_policy" "upload_handler" {
   name = "${var.project_name}-upload-handler-policy"
   role = aws_iam_role.upload_handler.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -69,7 +69,7 @@ resource "aws_iam_role_policy" "upload_handler" {
 # Extraction Worker Lambda Role
 resource "aws_iam_role" "extraction_worker" {
   name = "${var.project_name}-extraction-worker-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -88,7 +88,7 @@ resource "aws_iam_role" "extraction_worker" {
 resource "aws_iam_role_policy" "extraction_worker" {
   name = "${var.project_name}-extraction-worker-policy"
   role = aws_iam_role.extraction_worker.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -110,6 +110,58 @@ resource "aws_iam_role_policy" "extraction_worker" {
         Resource = [
           aws_dynamodb_table.uploads.arn,
           aws_dynamodb_table.extracted_data.arn
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
+# Data Reader Lambda Role
+resource "aws_iam_role" "data_reader" {
+  name = "${var.project_name}-data-reader-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Data Reader Policy (read-only DynamoDB)
+resource "aws_iam_role_policy" "data_reader" {
+  name = "${var.project_name}-data-reader-policy"
+  role = aws_iam_role.data_reader.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:Query"
+        ]
+        Resource = [
+          aws_dynamodb_table.uploads.arn,
+          "${aws_dynamodb_table.uploads.arn}/index/*",
+          aws_dynamodb_table.extracted_data.arn,
+          "${aws_dynamodb_table.extracted_data.arn}/index/*"
         ]
       },
       {

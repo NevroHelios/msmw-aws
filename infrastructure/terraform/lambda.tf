@@ -83,3 +83,64 @@ variable "openai_api_key" {
   sensitive   = true
   default     = ""
 }
+
+# Data Reader Lambda (queries DynamoDB)
+resource "aws_lambda_function" "data_reader" {
+  filename         = "../../lambda_packages/data_reader.zip"
+  function_name    = "${var.project_name}-data-reader"
+  role             = aws_iam_role.data_reader.arn
+  handler          = "handler.lambda_handler"
+  source_code_hash = fileexists("../../lambda_packages/data_reader.zip") ? filebase64sha256("../../lambda_packages/data_reader.zip") : ""
+  runtime          = "python3.11"
+  timeout          = 10
+  memory_size      = 128
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE_UPLOADS        = aws_dynamodb_table.uploads.name
+      DYNAMODB_TABLE_EXTRACTED_DATA = aws_dynamodb_table.extracted_data.name
+      LOG_LEVEL                     = "INFO"
+    }
+  }
+
+  tags = {
+    Name = "Data Reader"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "data_reader" {
+  name              = "/aws/lambda/${aws_lambda_function.data_reader.function_name}"
+  retention_in_days = 7
+}
+
+# Analysis Orchestrator Lambda (runs all BRIA agents)
+resource "aws_lambda_function" "analysis_orchestrator" {
+  filename         = "../../lambda_packages/analysis_orchestrator.zip"
+  function_name    = "${var.project_name}-analysis-orchestrator"
+  role             = aws_iam_role.analysis_orchestrator.arn
+  handler          = "handler.lambda_handler"
+  source_code_hash = fileexists("../../lambda_packages/analysis_orchestrator.zip") ? filebase64sha256("../../lambda_packages/analysis_orchestrator.zip") : ""
+  runtime          = "python3.11"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      S3_BUCKET_NAME                  = aws_s3_bucket.main.id
+      DYNAMODB_TABLE_UPLOADS          = aws_dynamodb_table.uploads.name
+      DYNAMODB_TABLE_EXTRACTED_DATA   = aws_dynamodb_table.extracted_data.name
+      DYNAMODB_TABLE_ANALYSIS_RESULTS = aws_dynamodb_table.analysis_results.name
+      LOG_LEVEL                       = "INFO"
+    }
+  }
+
+  tags = {
+    Name = "Analysis Orchestrator"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "analysis_orchestrator" {
+  name              = "/aws/lambda/${aws_lambda_function.analysis_orchestrator.function_name}"
+  retention_in_days = 7
+}
+
