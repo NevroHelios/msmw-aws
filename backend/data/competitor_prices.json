@@ -1,0 +1,54 @@
+{
+    "Tata Salt 1kg": {
+        "amazon_price": 28,
+        "local_market_avg": 27
+    },
+    "Fortune Mustard Oil 1L": {
+        "amazon_price": 185,
+        "local_market_avg": 190
+    },
+    "Amul Butter 100g": {
+        "amazon_price": 56,
+        "local_market_avg": 55
+    },
+    "Maggi Noodles 70g": {
+        "amazon_price": 14,
+        "local_market_avg": 14
+    },
+    "Surf Excel Bar 250g": {
+        "amazon_price": 32,
+        "local_market_avg": 30
+    },
+    "Colgate Strong Teeth 100g": {
+        "amazon_price": 54,
+        "local_market_avg": 52
+    },
+    "Dettol Antiseptic Liquid 100ml": {
+        "amazon_price": 48,
+        "local_market_avg": 46
+    },
+    "Cadbury Dairy Milk Silk": {
+        "amazon_price": 85,
+        "local_market_avg": 80
+    },
+    "Coca Cola 750ml": {
+        "amazon_price": 38,
+        "local_market_avg": 40
+    },
+    "India Gate Basmati Rice 5kg": {
+        "amazon_price": 580,
+        "local_market_avg": 560
+    },
+    "Rice 25kg": {
+        "amazon_price": 1180,
+        "local_market_avg": 1195
+    },
+    "Sunflower Oil 1L": {
+        "amazon_price": 135,
+        "local_market_avg": 138
+    },
+    "Sugar 1kg": {
+        "amazon_price": 44,
+        "local_market_avg": 42
+    }
+}

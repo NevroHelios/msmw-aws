@@ -176,3 +176,75 @@ resource "aws_iam_role_policy" "data_reader" {
     ]
   })
 }
+
+# Analysis Orchestrator Lambda Role
+resource "aws_iam_role" "analysis_orchestrator" {
+  name = "${var.project_name}-analysis-orchestrator-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "analysis_orchestrator" {
+  name = "${var.project_name}-analysis-orchestrator-policy"
+  role = aws_iam_role.analysis_orchestrator.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:Query"
+        ]
+        Resource = [
+          aws_dynamodb_table.extracted_data.arn,
+          "${aws_dynamodb_table.extracted_data.arn}/index/*",
+          aws_dynamodb_table.uploads.arn,
+          "${aws_dynamodb_table.uploads.arn}/index/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem"
+        ]
+        Resource = [
+          aws_dynamodb_table.analysis_results.arn
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.main.arn,
+          "${aws_s3_bucket.main.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+

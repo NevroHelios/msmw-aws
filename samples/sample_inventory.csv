@@ -1,7 +1,13 @@
-product_name,current_stock,reorder_level,supplier,last_restocked
-Rice 25kg,45,20,ABC Traders,2026-02-01
-Wheat 10kg,62,30,XYZ Suppliers,2026-02-03
-Sugar 1kg,120,50,Sweet Co,2026-02-05
-Cooking Oil 5L,28,15,Oil Pvt Ltd,2026-02-08
-Dal 1kg,55,40,Grain Traders,2026-02-10
-Tea Powder 250g,80,25,Tea House,2026-02-12
+item_id,item_name,current_stock,reorder_threshold,supplier_lead_time_days,last_restock_date,max_storage_capacity
+I001,Rice 25kg,8,10,3,2026-02-10,80
+I002,Sunflower Oil 1L,10,15,2,2026-02-08,60
+I003,Sugar 1kg,3,20,2,2026-02-05,100
+I004,Tata Salt 1kg,28,20,3,2026-02-01,80
+I005,Amul Butter 100g,1,10,1,2026-02-12,30
+I006,Maggi Noodles 70g,35,50,2,2026-02-10,200
+I007,Surf Excel Bar 250g,25,30,3,2026-01-28,60
+I008,Colgate Strong Teeth 100g,5,12,2,2026-01-20,40
+I009,Cadbury Dairy Milk Silk,0,25,2,2026-02-10,50
+I010,Coca Cola 750ml,22,40,1,2026-02-08,100
+I011,Dettol Antiseptic Liquid 100ml,10,8,3,2026-01-15,25
+I012,Fortune Mustard Oil 1L,12,15,2,2026-02-05,40

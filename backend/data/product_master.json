@@ -1,0 +1,134 @@
+[
+    {
+        "item_id": "I001",
+        "item_name": "Rice 25kg",
+        "category": "Grains",
+        "hsn_code": "1006",
+        "gst_rate": 5,
+        "uom": "Bag",
+        "shelf_life_days": 730,
+        "reorder_threshold": 8,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I002",
+        "item_name": "Sunflower Oil 1L",
+        "category": "Oil",
+        "hsn_code": "1512",
+        "gst_rate": 5,
+        "uom": "Bottle",
+        "shelf_life_days": 270,
+        "reorder_threshold": 15,
+        "risk_profile": "Medium"
+    },
+    {
+        "item_id": "I003",
+        "item_name": "Sugar 1kg",
+        "category": "Grains",
+        "hsn_code": "1701",
+        "gst_rate": 5,
+        "uom": "Packet",
+        "shelf_life_days": 730,
+        "reorder_threshold": 20,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I004",
+        "item_name": "Tata Salt 1kg",
+        "category": "Essentials",
+        "hsn_code": "2501",
+        "gst_rate": 0,
+        "uom": "Packet",
+        "shelf_life_days": 730,
+        "reorder_threshold": 20,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I005",
+        "item_name": "Amul Butter 100g",
+        "category": "Dairy",
+        "hsn_code": "0405",
+        "gst_rate": 12,
+        "uom": "Block",
+        "shelf_life_days": 30,
+        "reorder_threshold": 10,
+        "risk_profile": "High_Expiry"
+    },
+    {
+        "item_id": "I006",
+        "item_name": "Maggi Noodles 70g",
+        "category": "Processed Food",
+        "hsn_code": "1902",
+        "gst_rate": 18,
+        "uom": "Packet",
+        "shelf_life_days": 240,
+        "reorder_threshold": 50,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I007",
+        "item_name": "Surf Excel Bar 250g",
+        "category": "Cleaning",
+        "hsn_code": "3401",
+        "gst_rate": 18,
+        "uom": "Bar",
+        "shelf_life_days": 1095,
+        "reorder_threshold": 30,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I008",
+        "item_name": "Colgate Strong Teeth 100g",
+        "category": "Personal Care",
+        "hsn_code": "3306",
+        "gst_rate": 18,
+        "uom": "Tube",
+        "shelf_life_days": 730,
+        "reorder_threshold": 12,
+        "risk_profile": "Medium"
+    },
+    {
+        "item_id": "I009",
+        "item_name": "Cadbury Dairy Milk Silk",
+        "category": "Sweets",
+        "hsn_code": "1806",
+        "gst_rate": 18,
+        "uom": "Bar",
+        "shelf_life_days": 365,
+        "reorder_threshold": 25,
+        "risk_profile": "High_Melting"
+    },
+    {
+        "item_id": "I010",
+        "item_name": "Coca Cola 750ml",
+        "category": "Beverages",
+        "hsn_code": "2202",
+        "gst_rate": 28,
+        "uom": "Bottle",
+        "shelf_life_days": 180,
+        "reorder_threshold": 40,
+        "risk_profile": "High_Demand_Spike"
+    },
+    {
+        "item_id": "I011",
+        "item_name": "Dettol Antiseptic Liquid 100ml",
+        "category": "Personal Care",
+        "hsn_code": "3004",
+        "gst_rate": 12,
+        "uom": "Bottle",
+        "shelf_life_days": 1095,
+        "reorder_threshold": 8,
+        "risk_profile": "Low"
+    },
+    {
+        "item_id": "I012",
+        "item_name": "Fortune Mustard Oil 1L",
+        "category": "Oil",
+        "hsn_code": "1512",
+        "gst_rate": 5,
+        "uom": "Litre",
+        "shelf_life_days": 270,
+        "reorder_threshold": 15,
+        "risk_profile": "Medium"
+    }
+]

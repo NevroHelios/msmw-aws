@@ -63,3 +63,5 @@ lambdas/
 # Temporary files
 tmp/
 temp/
+
+*.md
