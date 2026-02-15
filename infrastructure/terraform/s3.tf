@@ -83,3 +83,27 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
     }
   }
 }
+
+
+# 1. Grant S3 permission to invoke your Lambda function
+resource "aws_lambda_permission" "allow_s3_to_call_extraction" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.extraction_worker.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.main.arn
+}
+
+# 2. Configure the bucket to send a notification to Lambda on upload
+resource "aws_s3_bucket_notification" "main_notification" {
+  bucket = aws_s3_bucket.main.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.extraction_worker.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "raw/"   # Only trigger for files in the 'raw' folder
+  }
+
+  # Ensure the Lambda permission is created before the notification
+  depends_on = [aws_lambda_permission.allow_s3_to_call_extraction]
+}

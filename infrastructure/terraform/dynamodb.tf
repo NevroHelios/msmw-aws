@@ -85,3 +85,38 @@ resource "aws_dynamodb_table" "extracted_data" {
     Name = "ExtractedData"
   }
 }
+
+# Table 4: Analysis Results (The output of Risk/Demand Lambdas)
+resource "aws_dynamodb_table" "analysis_results" {
+  name           = "AnalysisResults"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "store_id"
+  range_key      = "analysis_id" # unique ID for each report run
+
+  attribute {
+    name = "store_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "analysis_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+
+  # GSI to get latest reports for a store
+  global_secondary_index {
+    name            = "timestamp-index"
+    hash_key        = "store_id"
+    range_key       = "timestamp"
+    projection_type = "ALL"
+  }
+
+  tags = {
+    Name = "AnalysisResults"
+  }
+}
